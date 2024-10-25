@@ -59,19 +59,26 @@ for p in paths:
         el = eout.readline().strip()
         lns = res.stdout.splitlines()
         i = 0
+        err = False
         while True:
             if i >= len(lns):
-                if el == "":
-                    break
-                exit(f"line {i}: expected '{el}', got eof")
+                if el != "":
+                    err = True
+                    print(f"line {i}: expected '{el}', got eof")
+                break
             l = lns[i].strip()
             if el == "" and el != l:
-                exit(f"line {i}: expected eof, got '{l}'")
+                print(f"line {i}: expected eof, got '{l}'")
+                err = True
+                break
             if el != l:
-                exit(f"line {i}: expected '{el}', got '{l}'")
+                print(f"line {i}: expected '{el}', got '{l}'")
+                err = True
             el = eout.readline().strip()
             i += 1
-    print(res.stderr)
+    if not err:
+        print(res.stderr)
+    else: print()
 
 
 

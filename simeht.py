@@ -39,7 +39,6 @@ with open(argv[1], "r") as f:
             case "mem": c.mem = int(mg["val"])
             case _: pass
         l = f.readline()
-    print(c.time, c.mem, c.out, c.pattern, c.inp, c.bin)
     if any(map(lambda x: x == None or x == "", [c.pattern, c.inp, c.out, c.bin])):
         exit("missing one of 'pattern', 'in', 'out', 'bin'")
 
@@ -55,15 +54,24 @@ for p in paths:
         "-t", c.time,
         "--run", c.bin
     ])), text=True, capture_output=True)
+    print(p)
     with open(path.join(p, str(c.out)), "r") as eout:
-        for i, l in enumerate(res.stdout.splitlines()):
-            el = eout.readline().strip()
-            l = l.strip()
+        el = eout.readline().strip()
+        lns = res.stdout.splitlines()
+        i = 0
+        while True:
+            if i >= len(lns):
+                if el == "":
+                    break
+                exit(f"line {i}: expected '{el}', got eof")
+            l = lns[i].strip()
             if el == "" and el != l:
                 exit(f"line {i}: expected eof, got '{l}'")
             if el != l:
                 exit(f"line {i}: expected '{el}', got '{l}'")
-    print(f"{p} {res.stderr}")
+            el = eout.readline().strip()
+            i += 1
+    print(res.stderr)
 
 
 
